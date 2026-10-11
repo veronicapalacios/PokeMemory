@@ -57,6 +57,7 @@ button{
   padding: 12px;
   font-size: 18px;
   border-radius:30px;
+  margin: 10px 0 0 10px;
 }
 .profile-card{
   background-color: #f6f3f3e4;
