@@ -1,3 +1,5 @@
+import { saveProfile } from "./storage.js"
+
 export function renderProfile(){ 
     document.querySelector('#app').innerHTML = `
     <main>
@@ -50,6 +52,18 @@ export async function initProfile () {
 
         if (!selectedPokemonData){
             alert ('Please select your favorite Pokémon to continue...')
+            return
+        }
+
+        const profile = {
+            username: username,
+            favoritePokemon: selectedPokemonData
+        }
+
+        const response = saveProfile(profile)
+
+        if (!response.status) {
+            alert(`Could not save your profile.`)
             return
         }
 
