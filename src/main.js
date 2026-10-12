@@ -1,14 +1,13 @@
 import './style.css'
 import { renderProfile,initProfile } from './profile.js'
 import { getProfile } from './storage.js'
-
-renderProfile()
-initProfile()
+import { renderGame } from './game.js'
 
 const response = getProfile()
 
 if (response.status && response.profile) {
-  console.log(`Session found:`, response.profile)
+  renderGame(response.profile)
 } else {
-  console.log ('No active session found')
+  renderProfile()
+  initProfile()
 }
