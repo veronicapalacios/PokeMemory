@@ -1,3 +1,5 @@
+import { loadPokemon } from "./pokemon-api.js"
+
 export function renderGame (profile) {
     const app = document.querySelector('#app')
 
@@ -21,7 +23,7 @@ export function renderGame (profile) {
                         id="card-count"
                         name="card-count"
                         min="2"
-                        step="2"
+                        step="1"
                         required
                     >
                     <button type="submit">Start game</button>
@@ -39,7 +41,7 @@ export function renderGame (profile) {
     const cardCountInput = document.querySelector ('#card-count')
     const gameFeedback =document.querySelector ('#game-feedback')
 
-    gameForm.addEventListener('submit', (event) => {
+    gameForm.addEventListener('submit', async (event) => {
         event.preventDefault()
 
         const cardCount =Number (cardCountInput.value)
@@ -47,24 +49,150 @@ export function renderGame (profile) {
         if (
             !Number.isInteger(cardCount) || cardCount<=0 || cardCount%2 !== 0
         ) {
-            gameFeedback.textContent = 'Introduce un número entero positivo y par de cartas.'
+            gameFeedback.textContent = 'Enter a positive, even number of cards.'
             return
         } 
-        renderCards(cardCount)
-        gameFeedback.textContent = `Número válido: ${cardCount} cartas.`
+
+        try {
+            const cards = await createPokemonPairs(cardCount)
+            shuffleCards(cards)
+            renderCards(cards)
+            gameFeedback.textContent=`Game ready with ${cardCount} cards.`
+        } catch (error) {
+            console.error('Error creating the game:', error)
+            gameFeedback.textContent = 'Unable to load the game. Please try again.'
+
+        }
     })
 }
 
-function renderCards (cardCount) {
+function renderCards (cards) {
     const gameCards =document.querySelector ('#game-cards')
     gameCards.innerHTML = ''
-    
-    for (let i=0; i<cardCount; i++) {
-        const card =document.createElement ('button')
-        card.type= 'button'
-        card.classList.add ('memory-card')
-        card.textContent = '?'
 
+    const selectedCards = []
+    let isChecking=false
+    let matchedPairs = 0
+    
+    cards.forEach ((pokemon, index) => {
+        const card = document.createElement ('button')
+        card.type = 'button'
+        card.classList.add('memory-card')
+
+        card.dataset.index = index
+        card.dataset.pokemonId = pokemon.id
+
+        const image = document.createElement('img')
+        image.src = pokemon.image
+        image.alt = pokemon.name
+        image.hidden = true
+        card.appendChild(image)
+        
+        const questionMark = document.createElement('span')
+        questionMark.textContent = '?'
+
+        card.appendChild(questionMark)
+
+        card.addEventListener('click',() => {
+            if (isChecking) {
+                return
+            }
+            if (selectedCards.includes (card)) {
+                return
+            }
+            image.hidden = false
+            questionMark.hidden = true
+
+            selectedCards.push(card)
+
+            if (selectedCards.length < 2) {
+                return
+            }
+            const firstCard = selectedCards[0]
+            const secondCard = selectedCards[1]
+            
+            if (firstCard.dataset.pokemonId === secondCard.dataset.pokemonId) {
+                firstCard.disabled=true
+                secondCard.disabled=true
+
+                firstCard.classList.add('matched')
+                secondCard.classList.add('matched')
+
+                matchedPairs++
+                if (matchedPairs === cards.length/2) {
+                    document.querySelector('#game-feedback').textContent =
+                        '¡Congratulations! ¡You found all the pairs!'
+                }
+                
+                selectedCards.length=0
+                return
+            } 
+            
+            isChecking=true
+
+            setTimeout (() => {
+                selectedCards.forEach((selectedCard)=> {
+                    selectedCard.querySelector('img').hidden=true
+                    selectedCard.querySelector('span').hidden=false
+                })
+                selectedCards.length=0
+                isChecking=false
+            }, 1000)
+        })
         gameCards.appendChild(card)
+    })
+}
+
+async function getRandomPokemon (cardCount) {
+    const pokemonList = await loadPokemon ()
+    const pairCount = cardCount /2
+
+    if (pokemonList.length < pairCount) {
+        throw new Error ('Not enough Pokémon available')
     }
+
+    const shuffledPokemon = [...pokemonList]
+
+    for (let i= shuffledPokemon.length -1; i > 0 ; i--) {
+        const randomIndex = Math.floor (Math.random() * (i+1))
+        const temp = shuffledPokemon [i]
+        shuffledPokemon [i] = shuffledPokemon [randomIndex]
+        shuffledPokemon[randomIndex] = temp        
+    }
+    return shuffledPokemon.slice (0, pairCount)
+}
+
+async function getPokemonDetails(pokemon) {
+    const response = await fetch(pokemon.url)
+    if (!response.ok) {
+        throw new Error('Error fetching Pokémon details')
+    }
+    const data = await response.json()
+    return {
+        id: data.id,
+        name: data.name, 
+        image: data.sprites.front_default
+    }
+}
+
+async function createPokemonPairs(cardCount) {
+    const selectedPokemon = await getRandomPokemon(cardCount)
+    const pokemonDetails = await Promise.all (
+        selectedPokemon.map((pokemon) => getPokemonDetails(pokemon))
+    )
+    const cards = pokemonDetails.flatMap((pokemon) => [
+        { ...pokemon },
+        { ...pokemon }
+    ])
+    return cards
+}
+
+function shuffleCards(cards) {
+    for (let i= cards.length -1; i > 0 ; i--) {
+        const randomIndex = Math.floor (Math.random() * (i+1))
+        const temp = cards [i]
+        cards [i] = cards [randomIndex]
+        cards[randomIndex] = temp      
+    }
+    return cards
 }
