@@ -1,4 +1,6 @@
 import { loadPokemon } from "./pokemon-api.js"
+import { saveGameRresult } from "./storage.js"
+let timerInterval = null
 
 export function renderGame (profile) {
     const app = document.querySelector('#app')
@@ -32,6 +34,7 @@ export function renderGame (profile) {
             </section>
             <section class="game-board">
                 <h2>Memory Game </h2>
+                <p id="game-timer">Time: 00:00</p>
                 <div id="game-cards"></div>
             </section>
         </main>
@@ -56,7 +59,7 @@ export function renderGame (profile) {
         try {
             const cards = await createPokemonPairs(cardCount)
             shuffleCards(cards)
-            renderCards(cards)
+            renderCards(cards, profile, cardCount)
             gameFeedback.textContent=`Game ready with ${cardCount} cards.`
         } catch (error) {
             console.error('Error creating the game:', error)
@@ -66,13 +69,39 @@ export function renderGame (profile) {
     })
 }
 
-function renderCards (cards) {
+function renderCards (cards, profile, cardCount) {
     const gameCards =document.querySelector ('#game-cards')
     gameCards.innerHTML = ''
 
     const selectedCards = []
     let isChecking=false
     let matchedPairs = 0
+    let elapsedSeconds = 0
+    let gameFinished = false
+
+    const gameTimer = document.querySelector('#game-timer')
+
+    function updateTimer() {
+        const minutes = Math.floor(elapsedSeconds/60)
+        const seconds = elapsedSeconds % 60
+
+        const formattedMinutes = String(minutes).padStart(2, '0')
+        const formattedSeconds = String(seconds).padStart(2, '0')
+
+        gameTimer.textContent = `Time: ${formattedMinutes}:${formattedSeconds}`
+    }
+
+    if (timerInterval !== null) {
+        clearInterval(timerInterval)
+    }
+
+    elapsedSeconds = 0
+    updateTimer()
+
+    timerInterval = setInterval(() => {
+        elapsedSeconds++
+        updateTimer()
+    },1000)
     
     cards.forEach ((pokemon, index) => {
         const card = document.createElement ('button')
@@ -119,11 +148,23 @@ function renderCards (cards) {
                 secondCard.classList.add('matched')
 
                 matchedPairs++
-                if (matchedPairs === cards.length/2) {
+
+                if (matchedPairs === cards.length/2 && !gameFinished) {
+                    gameFinished = true
+                    clearInterval(timerInterval)
+
+                    const result = {
+                        id: Date.now(),
+                        username: profile.username,
+                        favoritePokemon: profile.favoritePokemon.name,
+                        time: elapsedSeconds,
+                        cardCount: cardCount
+                    }
+                    saveGameRresult(result)
+
                     document.querySelector('#game-feedback').textContent =
                         '¡Congratulations! ¡You found all the pairs!'
                 }
-                
                 selectedCards.length=0
                 return
             } 
