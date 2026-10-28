@@ -70,5 +70,13 @@ button{
 }
 label{
   color: #001e78;
-
+}
+/*Highlights the most recent game in the ranking*/
+.latest-game {
+  background-color: #ffe89c;
+}
+/*Highlights the cells in that row*/
+.latest-game td {
+  border-top: 2px solid #C7A36F;
+  border-bottom: 2px solid #f9d31a;;
 }

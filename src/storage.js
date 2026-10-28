@@ -43,7 +43,7 @@ export function getGameHistory() {
     }
 }
 
-export function saveGameRresult (result) {
+export function saveGameResult (result) {
     try {
         const history = getGameHistory()
         history.push(result)

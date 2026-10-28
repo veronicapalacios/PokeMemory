@@ -1,6 +1,9 @@
 import { loadPokemon } from "./pokemon-api.js"
-import { saveGameRresult } from "./storage.js"
+import { saveGameResult } from "./storage.js"
+import { getGameHistory } from "./storage.js"
 let timerInterval = null
+let hideCardsTimeout = null
+let gameRequestId = 0
 
 export function renderGame (profile) {
     const app = document.querySelector('#app')
@@ -37,12 +40,90 @@ export function renderGame (profile) {
                 <p id="game-timer">Time: 00:00</p>
                 <div id="game-cards"></div>
             </section>
+            <section class="game-history">
+                <h2>Ranking</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Position</th>
+                            <th>Player</th>
+                            <th>Favorite Pokémon</th>
+                            <th>Time</th>
+                            <th>Cards</th>
+                        </tr>
+                    </thead>
+                    <tbody id="game-history"></tbody>
+                </table>
+            </section>
         </main>
     `
+
+    function renderGameHistory() {
+        const gameHistory = document.querySelector('#game-history')
+        const response = getGameHistory()
+        gameHistory.innerHTML=''
+        const latestGame = [...response].sort((a,b) => b.id - a.id)[0]
+
+        response. sort ((a,b) =>{
+            if (b.cardCount !== a.cardCount) {
+                return b.cardCount - a.cardCount
+            }
+            return a.time - b.time
+        })
+
+        if (response.length === 0) {
+            const row = document.createElement('tr')
+            const cell = document.createElement('td')
+            cell.textContent = 'No games played yet'
+            cell.colSpan = 5
+            row.appendChild(cell)
+            gameHistory.appendChild(row)
+            return
+        }
+        const topGames = response.slice(0,5)
+        if (!topGames.some((game) => game.id === latestGame.id)) {
+            topGames.push(latestGame)
+        }
+
+        topGames.forEach((result,index) => {
+            const row = document.createElement('tr')
+
+            if (result.id === latestGame.id) {
+                row.classList.add('latest-game')
+            }
+            
+            const minutes = String(Math.floor(result.time/60)).padStart(2,'0')
+            const seconds = String(result.time%60).padStart(2,'0')
+
+            row.innerHTML = `
+                <td>${response.findIndex((game) => game.id === result.id) + 1}</td>
+                <td>${result.username}</td>
+                <td>${result.favoritePokemon}</td>
+                <td>${minutes}:${seconds}</td>
+                <td>${result.cardCount}</td>
+            `
+            gameHistory.appendChild(row)
+        })
+
+        if (response.length > 5) {
+            const hiddenGames = response.length - topGames.length
+            if (hiddenGames>0) {
+                const row = document.createElement('tr')
+                const cell = document.createElement('td')
+                cell.textContent = `And ${hiddenGames} more games...`
+                cell.colSpan = 5
+                row.appendChild(cell)
+                gameHistory.appendChild(row)
+            }
+        }
+    }
+
+    renderGameHistory()
 
     const gameForm = document.querySelector('#game-form')
     const cardCountInput = document.querySelector ('#card-count')
     const gameFeedback =document.querySelector ('#game-feedback')
+    const startButton = gameForm.querySelector('button[type="submit"]')
 
     gameForm.addEventListener('submit', async (event) => {
         event.preventDefault()
@@ -56,12 +137,35 @@ export function renderGame (profile) {
             return
         } 
 
+        const requestId = ++gameRequestId
+        document.querySelector('#game-cards').innerHTML = ''
+        document.querySelector('#game-timer').textContent = 'Time: 00:00'
+
+        if (timerInterval !== null) {
+            clearInterval (timerInterval)
+            timerInterval = null
+        }
+
+        if (hideCardsTimeout !== null) {
+            clearTimeout(hideCardsTimeout)
+            hideCardsTimeout = null
+        }
+
+        startButton.disabled = true
         try {
             const cards = await createPokemonPairs(cardCount)
+            if (requestId !== gameRequestId) {
+                return
+            }
             shuffleCards(cards)
-            renderCards(cards, profile, cardCount)
+            renderCards(cards, profile, cardCount, renderGameHistory)
+            startButton.disabled = false
             gameFeedback.textContent=`Game ready with ${cardCount} cards.`
         } catch (error) {
+            if (requestId !== gameRequestId) {  
+                return
+            }
+            startButton.disabled = false
             console.error('Error creating the game:', error)
             gameFeedback.textContent = 'Unable to load the game. Please try again.'
 
@@ -69,7 +173,7 @@ export function renderGame (profile) {
     })
 }
 
-function renderCards (cards, profile, cardCount) {
+function renderCards (cards, profile, cardCount, renderGameHistory) {
     const gameCards =document.querySelector ('#game-cards')
     gameCards.innerHTML = ''
 
@@ -93,6 +197,11 @@ function renderCards (cards, profile, cardCount) {
 
     if (timerInterval !== null) {
         clearInterval(timerInterval)
+    }
+
+    if (hideCardsTimeout !== null) {
+        clearTimeout(hideCardsTimeout)
+        hideCardsTimeout = null
     }
 
     elapsedSeconds = 0
@@ -160,7 +269,8 @@ function renderCards (cards, profile, cardCount) {
                         time: elapsedSeconds,
                         cardCount: cardCount
                     }
-                    saveGameRresult(result)
+                    saveGameResult(result)
+                    renderGameHistory()
 
                     document.querySelector('#game-feedback').textContent =
                         '¡Congratulations! ¡You found all the pairs!'
@@ -171,13 +281,14 @@ function renderCards (cards, profile, cardCount) {
             
             isChecking=true
 
-            setTimeout (() => {
+            hideCardsTimeout = setTimeout (() => {
                 selectedCards.forEach((selectedCard)=> {
                     selectedCard.querySelector('img').hidden=true
                     selectedCard.querySelector('span').hidden=false
                 })
-                selectedCards.length=0
-                isChecking=false
+                selectedCards.length = 0
+                isChecking = false
+                hideCardsTimeout = null
             }, 1000)
         })
         gameCards.appendChild(card)
