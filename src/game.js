@@ -1,179 +1,175 @@
-import { loadPokemon } from "./pokemon-api.js"
-import { saveGameResult } from "./storage.js"
-import { getGameHistory } from "./storage.js"
+import { createPokemonPairs } from "./pokemon-api.js"
+import { renderProfile, initProfile } from "./profile.js"
+import { saveGameResult, removeProfile} from "./storage.js"
+import { renderGameHistory } from "./ranking.js"
+
 let timerInterval = null
 let hideCardsTimeout = null
 let gameRequestId = 0
 
 export function renderGame (profile) {
     const app = document.querySelector('#app')
+        app.innerHTML = `
+            <main class="game-layout">
+                <aside class="game-sidebar">
+                    <!-- PERFIL -->
+                    <section class="game-header">
+                        <h2>Welcome, ${profile.username}!</h2>
 
-    app.innerHTML = `
-        <main>
-            <h1> PokeMemory </h1>
+                        <div class="player-favorite">
+                            <img src="${profile.favoritePokemon.image}" alt="${profile.favoritePokemon.name}">
+                            <div>
+                                <p>Favorite Pokémon:</p>
+                                <strong>${profile.favoritePokemon.name}</strong>
+                            </div>
+                        </div>
 
-            <section class="game-header">
-                <h2> Welcome, ${profile.username}!</h2>
-                <div class="player-favorite">
-                    <img src="${profile.favoritePokemon.image}" alt="${profile.favoritePokemon.name}">
-                    <p>Favorite Pokémon: ${profile.favoritePokemon.name}</p>
-                </div>
-            </section>
-            <section class="game-setup">
-                <h2>New game </h2>
-                <form id="game-form">
-                    <label for="card-count">Number of cards </label>
-                    <input
-                        type="number"
-                        id="card-count"
-                        name="card-count"
-                        min="2"
-                        step="1"
-                        required
-                    >
-                    <button type="submit">Start game</button>
-                    <p id="game-feedback"></p>
-                </form>
-            </section>
-            <section class="game-board">
-                <h2>Memory Game </h2>
-                <p id="game-timer">Time: 00:00</p>
-                <div id="game-cards"></div>
-            </section>
-            <section class="game-history">
-                <h2>Ranking</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Position</th>
-                            <th>Player</th>
-                            <th>Favorite Pokémon</th>
-                            <th>Time</th>
-                            <th>Cards</th>
-                        </tr>
-                    </thead>
-                    <tbody id="game-history"></tbody>
-                </table>
-            </section>
-        </main>
-    `
+                        <button id="logout-button" type="button">Log out</button>
+                    </section>
 
-    function renderGameHistory() {
-        const gameHistory = document.querySelector('#game-history')
-        const response = getGameHistory()
-        gameHistory.innerHTML=''
-        const latestGame = [...response].sort((a,b) => b.id - a.id)[0]
+                    <!-- CONFIGURACIÓN DE PARTIDA -->
+                    <section class="game-setup">
+                        <h2>New game</h2>
 
-        response. sort ((a,b) =>{
-            if (b.cardCount !== a.cardCount) {
-                return b.cardCount - a.cardCount
-            }
-            return a.time - b.time
-        })
+                        <form id="game-form">
+                            <label for="card-count">Number of cards</label>
 
-        if (response.length === 0) {
-            const row = document.createElement('tr')
-            const cell = document.createElement('td')
-            cell.textContent = 'No games played yet'
-            cell.colSpan = 5
-            row.appendChild(cell)
-            gameHistory.appendChild(row)
-            return
-        }
-        const topGames = response.slice(0,5)
-        if (!topGames.some((game) => game.id === latestGame.id)) {
-            topGames.push(latestGame)
-        }
+                            <input
+                                type="number"
+                                id="card-count"
+                                name="card-count"
+                                min="2"
+                                step="1"
+                                required
+                            >
+                            <button type="submit">Start game</button>
+                            <button type="button" id="restart-button" hidden>Restart game</button>
+                        </form>
+                    </section>
+                    <!-- RANKING -->
+                    <section class="game-history">
+                        <h2>🏆 Ranking 🏆</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Position</th>
+                                    <th>Player</th>
+                                    <th>Favorite Pokémon</th>
+                                    <th>Time</th>
+                                    <th>Cards</th>
+                                </tr>
+                            </thead>
 
-        topGames.forEach((result,index) => {
-            const row = document.createElement('tr')
+                            <tbody id="game-history"></tbody>
+                        </table>
+                    </section>
+                </aside>
+                <section class="game-content">
+                    <h1>PokeMemory</h1>
+                    <section class="game-feedback-panel"
+                        <p id="game-feedback">Choose the number of cards and start playing</p>
+                    </section>
+                    <!-- TABLERO -->
+                    <section class="game-board">
+                        <div class="board-header">
+                            <h2>Memory Game</h2>
+                            <p id="game-timer">Time: 00:00</p>
+                        </div>
 
-            if (result.id === latestGame.id) {
-                row.classList.add('latest-game')
-            }
-            
-            const minutes = String(Math.floor(result.time/60)).padStart(2,'0')
-            const seconds = String(result.time%60).padStart(2,'0')
-
-            row.innerHTML = `
-                <td>${response.findIndex((game) => game.id === result.id) + 1}</td>
-                <td>${result.username}</td>
-                <td>${result.favoritePokemon}</td>
-                <td>${minutes}:${seconds}</td>
-                <td>${result.cardCount}</td>
-            `
-            gameHistory.appendChild(row)
-        })
-
-        if (response.length > 5) {
-            const hiddenGames = response.length - topGames.length
-            if (hiddenGames>0) {
-                const row = document.createElement('tr')
-                const cell = document.createElement('td')
-                cell.textContent = `And ${hiddenGames} more games...`
-                cell.colSpan = 5
-                row.appendChild(cell)
-                gameHistory.appendChild(row)
-            }
-        }
-    }
+                        <div id="game-cards"></div>
+                    </section>
+                </section>
+            </main>
+        `
 
     renderGameHistory()
+
+    const logoutButton = document.querySelector('#logout-button')
+    logoutButton.addEventListener('click', () => {
+        //Cancelamos el temporitzador activo
+        if (timerInterval !== null) {
+            clearInterval(timerInterval)
+            timerInterval = null
+        }
+        //Cancelamos la ocultación pendiente de las cartas
+        if (hideCardsTimeout !== null) {
+            clearTimeout(hideCardsTimeout)
+            hideCardsTimeout = null
+        }
+        //Impedimos que una petición antigua inicie partida después de cerrar sesión
+        gameRequestId++
+
+        removeProfile()
+        renderProfile()
+        initProfile()
+    })
 
     const gameForm = document.querySelector('#game-form')
     const cardCountInput = document.querySelector ('#card-count')
     const gameFeedback =document.querySelector ('#game-feedback')
     const startButton = gameForm.querySelector('button[type="submit"]')
+    const restartButton = document.querySelector('#restart-button')
 
-    gameForm.addEventListener('submit', async (event) => {
-        event.preventDefault()
-
-        const cardCount =Number (cardCountInput.value)
-
-        if (
-            !Number.isInteger(cardCount) || cardCount<=0 || cardCount%2 !== 0
-        ) {
-            gameFeedback.textContent = 'Enter a positive, even number of cards.'
+    async function startGame() {
+        const cardCount = Number(cardCountInput.value)
+        if (!Number.isInteger(cardCount) || cardCount <= 0 || cardCount % 2 !==0) {
+            gameFeedback.textContent = 'Enter a positive, even number of cards'
             return
-        } 
-
+        }
         const requestId = ++gameRequestId
         document.querySelector('#game-cards').innerHTML = ''
         document.querySelector('#game-timer').textContent = 'Time: 00:00'
 
+        //si hay un temporizador activo lo paramos
         if (timerInterval !== null) {
-            clearInterval (timerInterval)
+            clearInterval(timerInterval)
             timerInterval = null
         }
-
+        //si hay una ocultación de cartas pendiente, la paramos
         if (hideCardsTimeout !== null) {
             clearTimeout(hideCardsTimeout)
             hideCardsTimeout = null
         }
-
+        //desactivamos los botones mientras preparamos cartas
         startButton.disabled = true
+        restartButton.disabled = true
+
         try {
             const cards = await createPokemonPairs(cardCount)
             if (requestId !== gameRequestId) {
                 return
             }
             shuffleCards(cards)
-            renderCards(cards, profile, cardCount, renderGameHistory)
-            startButton.disabled = false
-            gameFeedback.textContent=`Game ready with ${cardCount} cards.`
+            renderCards(cards, profile, cardCount)
+
+            //Ocultamos start y mostramos restart cuando el juego esta preparado
+            startButton.hidden = true
+            restartButton.hidden = false
+
+            //Reactivamos restart 
+            restartButton.disabled = false
+            gameFeedback.textContent = `Game ready with ${cardCount} cards.`
         } catch (error) {
-            if (requestId !== gameRequestId) {  
+            if (requestId !== gameRequestId){
                 return
             }
+            //Reactivamos los botones si falla la carga
             startButton.disabled = false
+            restartButton.disabled = false
+
             console.error('Error creating the game:', error)
             gameFeedback.textContent = 'Unable to load the game. Please try again.'
-
         }
+    }
+    gameForm.addEventListener('submit', (event) => {
+        event.preventDefault()
+        startGame()
+    }) 
+    restartButton.addEventListener('click', () => {
+        startGame()
     })
 }
-
-function renderCards (cards, profile, cardCount, renderGameHistory) {
+function renderCards (cards, profile, cardCount) {
     const gameCards =document.querySelector ('#game-cards')
     gameCards.innerHTML = ''
 
@@ -240,7 +236,6 @@ function renderCards (cards, profile, cardCount, renderGameHistory) {
             }
             image.hidden = false
             questionMark.hidden = true
-
             selectedCards.push(card)
 
             if (selectedCards.length < 2) {
@@ -294,51 +289,6 @@ function renderCards (cards, profile, cardCount, renderGameHistory) {
         gameCards.appendChild(card)
     })
 }
-
-async function getRandomPokemon (cardCount) {
-    const pokemonList = await loadPokemon ()
-    const pairCount = cardCount /2
-
-    if (pokemonList.length < pairCount) {
-        throw new Error ('Not enough Pokémon available')
-    }
-
-    const shuffledPokemon = [...pokemonList]
-
-    for (let i= shuffledPokemon.length -1; i > 0 ; i--) {
-        const randomIndex = Math.floor (Math.random() * (i+1))
-        const temp = shuffledPokemon [i]
-        shuffledPokemon [i] = shuffledPokemon [randomIndex]
-        shuffledPokemon[randomIndex] = temp        
-    }
-    return shuffledPokemon.slice (0, pairCount)
-}
-
-async function getPokemonDetails(pokemon) {
-    const response = await fetch(pokemon.url)
-    if (!response.ok) {
-        throw new Error('Error fetching Pokémon details')
-    }
-    const data = await response.json()
-    return {
-        id: data.id,
-        name: data.name, 
-        image: data.sprites.front_default
-    }
-}
-
-async function createPokemonPairs(cardCount) {
-    const selectedPokemon = await getRandomPokemon(cardCount)
-    const pokemonDetails = await Promise.all (
-        selectedPokemon.map((pokemon) => getPokemonDetails(pokemon))
-    )
-    const cards = pokemonDetails.flatMap((pokemon) => [
-        { ...pokemon },
-        { ...pokemon }
-    ])
-    return cards
-}
-
 function shuffleCards(cards) {
     for (let i= cards.length -1; i > 0 ; i--) {
         const randomIndex = Math.floor (Math.random() * (i+1))

@@ -1,4 +1,5 @@
 import { saveProfile } from "./storage.js"
+import { loadPokemon } from "./pokemon-api.js"
 
 export function renderProfile(){ 
     document.querySelector('#app').innerHTML = `
@@ -30,10 +31,9 @@ export function renderProfile(){
     `
 }
 
-import { loadPokemon } from "./pokemon-api.js"
-let selectedPokemonData= null
-
 export async function initProfile () {
+    let selectedPokemonData= null
+    
     const pokemonList=await loadPokemon()
     const pokemonSearch = document.querySelector('#pokemon-search')
     const pokemonResults = document.querySelector('#pokemon-results')
@@ -68,6 +68,7 @@ export async function initProfile () {
         }
 
         alert(`Welcome, ${username}!`)
+        window.location.reload()
     })
 
     pokemonSearch.addEventListener('input', () => {
@@ -76,9 +77,13 @@ export async function initProfile () {
         selectedPokemonData=null
         selectedPokemon.innerHTML=''
 
-        const matches = pokemonList
-            .filter((pokemon) => pokemon.name.includes(searchText))
-            .slice (0,5)
+        let matches = [] 
+
+        if (searchText) {
+            matches = pokemonList
+                .filter((pokemon) => pokemon.name.includes(searchText))
+                .slice (0,5)
+        }
 
         matches.forEach((pokemon) => {
             const result = document.createElement('button')
@@ -107,7 +112,7 @@ export async function initProfile () {
                     pokemonResults.innerHTML=''
 
                 } catch (error) {
-                    console.error('Error loading selectec Pokémon:', error)
+                    console.error('Error loading selected Pokémon:', error)
                 }
             })
             pokemonResults.appendChild(result)
