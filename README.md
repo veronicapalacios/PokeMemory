@@ -16,7 +16,7 @@ Players can create their own profile, choose their favourite Pokémon, customise
 
 ## 🎥 Video Demonstration
 
-[Watch the project demonstration]([https://youtu.be/TQAhbjEn01o])
+[Watch the project demonstration](https://youtu.be/TQAhbjEn01o)
 
 ---
 
