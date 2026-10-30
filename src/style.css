@@ -1,296 +1,696 @@
+/* =========================================
+   POKEMEMORY - ESTILO GENERAL
+   ========================================= */
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  --blue: #082c83;
+  --blue-dark: #061d5b;
+  --blue-light: #4da9ff;
+  --yellow: #ffcf18;
+  --yellow-light: #ffe77a;
+  --cream: #fffdf5;
+  --glass: rgba(168, 205, 255, 0.35);
+  --glass-dark: rgba(8, 35, 91, 0.58);
+  --border-glass: rgba(255, 255, 255, 0.75);
+  --shadow: 0 8px 24px rgba(0, 19, 69, 0.35);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+* {
+  box-sizing: border-box;
+}
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+html {
+  min-height: 100%;
 }
 
 body {
   margin: 0;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
-}
-
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
-
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-}
-
-.hero {
-  position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
+  min-height: 100vh;
+  font-family: 'Nunito', sans-serif;
+  background-image: url('/wallpaper.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--blue-dark);
 }
 
 #app {
-  width: 1126px;
-  max-width: 100%;
+  width: 100%;
+  min-height: 100vh;
   margin: 0 auto;
+  padding: 16px;
+}
+
+/* =========================================
+   PANELES TRANSPARENTES
+   ========================================= */
+
+.profile-card,
+.game-header,
+.game-setup,
+.game-board,
+.game-history {
+  background: var(--glass);
+  border: 2px solid var(--border-glass);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.game-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+/* =========================================
+   TITULOS
+   ========================================= */
+
+h1,
+h2 {
+  color: var(--blue);
+  font-family: 'Lilita One', sans-serif;
   text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
 }
 
-#center {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
+h1 {
+  font-size: clamp(38px, 4vw, 58px);
+  margin: 0;
+  color: var(--yellow);
+  -webkit-text-stroke: 2px var(--blue);
+  paint-order: stroke fill;
+  text-shadow: 4px 5px 0 var(--blue-dark);
+  padding-bottom: 15px;
 }
 
-#next-steps {
+h2 {
+  font-size: 25px;
+  margin: 0 0 16px;
+}
+
+/* =========================================
+   FORMULARIO DE PERFIL
+   ========================================= */
+
+.profile-card {
+  width: 100%;
+  max-width: 540px;
+  margin: 40px auto;
+  padding: 30px;
+}
+
+.profile-card h2 {
+  font-size: 32px;
+}
+
+form {
   display: flex;
-  border-top: 1px solid var(--border);
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+label {
+  color: var(--blue);
+  font-weight: 800;
+}
+
+input,
+select {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 15px;
+  border: 2px solid rgba(8, 44, 131, 0.8);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--blue-dark);
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--blue-light);
+  box-shadow: 0 0 0 3px rgba(77, 169, 255, 0.2);
+}
+
+#pokemon-results {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#pokemon-results button {
+  width: 100%;
+  margin: 0;
   text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
 }
 
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-}
-
-#next-steps ul {
-  list-style: none;
-  padding: 0;
+#selected-pokemon {
   display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--blue);
+  font-weight: 800;
+}
+
+#selected-pokemon img {
+  width: 65px;
+  height: 65px;
+  object-fit: contain;
+}
+
+/* =========================================
+   BOTONES
+   ========================================= */
+
+button {
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.game-setup button,
+.profile-card button,
+#logout-button {
+  width: 100%;
+  padding: 12px 18px;
+  border: 3px solid var(--blue);
+  border-radius: 30px;
+  background: linear-gradient(135deg, var(--yellow-light), var(--yellow));
+  color: var(--blue);
+  font-size: 17px;
+  font-weight: 900;
+  box-shadow: 0 4px 0 var(--blue-dark);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.game-setup button:hover,
+.profile-card button:hover,
+#logout-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--blue-dark);
+}
+
+#logout-button {
+  width: auto;
+  padding: 9px 20px;
+  font-size: 14px;
+}
+
+/* =========================================
+   PANTALLA PRINCIPAL DEL JUEGO
+   ========================================= */
+
+#app > main:has(.game-board) {
+  width: 100%;
+  max-width: 1800px;
+  height: calc(100vh - 32px);
+  min-height: 650px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(270px, 0.31fr) minmax(0, 1fr);
+  gap: 14px;
+}
+
+/* =========================================
+   TITULO PRINCIPAL
+   ========================================= */
+
+#app > main:has(.game-board) > h1 {
+  grid-area: title;
+  align-self: start;
+  justify-self: center;
+  padding: 5px 0;
+  margin-top: 0;
+}
+
+/* =========================================
+   PERFIL - COLUMNA IZQUIERDA
+   ========================================= */
+
+.game-header {
+  grid-area: profile;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 5px;
+}
+
+.game-header h2 {
+  text-align: left;
+  margin: 0;
+}
+
+.player-favorite {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.player-favorite img {
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.2));
+}
+
+.player-favorite p {
+  margin: 0;
+  font-weight: 800;
+  color: var(--blue);
+}
+
+/* =========================================
+   NUEVA PARTIDA
+   ========================================= */
+
+.game-setup {
+  grid-area: setup;
+  padding: 18px;
+}
+
+.game-setup h2 {
+  text-align: left;
+  margin-bottom: 12px;
+}
+
+.game-setup form {
   gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
 }
 
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
+#card-count {
+  font-weight: 800;
 }
 
-.ticks {
+/* =========================================
+   MENSAJES DEL JUEGO
+   ========================================= */
+
+#game-feedback {
+  margin: 0 0 15px;
+  padding: 10px 15px;
+  border: 1px solid rgba(255, 207, 24, 0.9);
+  border-radius: 12px;
+  background: rgba(255, 231, 122, 0.65);
+  color: var(--blue);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+/* =========================================
+   TABLERO PRINCIPAL
+   ========================================= */
+
+.game-board {
+  grid-area: board;
+  min-width: 0;
+  min-height: 580px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.game-board h2 {
+  margin: 0 0 10px;
+  font-size: clamp(28px, 3vw, 40px);
+}
+
+.game-content {
+  height: 100%;
+  min-height: 0;
+}
+/* =========================================
+   TEMPORIZADOR
+   ========================================= */
+
+#game-timer {
+  align-self: flex-end;
+  flex-shrink: 0;
+  margin: 0 0 14px;
+  padding: 9px 20px;
+  border: 2px solid var(--yellow-light);
+  border-radius: 30px;
+  background: linear-gradient(135deg, var(--yellow-light), var(--yellow));
+  color: var(--blue);
+  font-size: 20px;
+  font-weight: 900;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* =========================================
+   DISTRIBUCION DE LAS CARTAS
+   ========================================= */
+
+#game-cards {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 12px;
+  align-content: center;
+  overflow-y: auto;
+  padding: 5px;
+}
+
+/* =========================================
+   CARTAS TIPO POKEMON
+   ========================================= */
+
+.memory-card {
   position: relative;
   width: 100%;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 0.68;
+  margin: 0;
+  padding: 8px;
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: 4px solid #f5c928;
+  border-radius: 13px;
+
+  background:
+    radial-gradient(circle at 50% 48%, rgba(65, 148, 255, 0.95), transparent 55%),
+    linear-gradient(145deg, #1675d1, #06317e 65%, #041d59);
+
+  color: var(--yellow);
+  font-family: 'Lilita One', sans-serif;
+  font-size: clamp(25px, 3vw, 42px);
+
+  box-shadow:
+    0 0 0 2px var(--blue-dark),
+    0 5px 12px rgba(0, 0, 0, 0.3);
+
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Logo superior del reverso */
+
+.memory-card::before {
+  content: "POKÉMON";
+  position: absolute;
+  top: 12%;
+  left: 0;
+  width: 100%;
+  color: var(--yellow);
+  font-family: 'Lilita One', sans-serif;
+  font-size: clamp(11px, 1.2vw, 19px);
+  text-align: center;
+  text-shadow:
+    2px 2px 0 var(--blue-dark),
+    -1px -1px 0 var(--blue-dark);
+  pointer-events: none;
+}
+
+/* Decoración central del reverso */
+
+.memory-card::after {
+  content: "";
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  width: 48%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 5px solid var(--blue-dark);
+  border-radius: 50%;
+  background:
+    linear-gradient(
+      to bottom,
+      #f04444 0%,
+      #f04444 46%,
+      var(--blue-dark) 46%,
+      var(--blue-dark) 54%,
+      #f7f7f7 54%,
+      #f7f7f7 100%
+    );
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+/* Interrogante encima de la decoración */
+
+.memory-card span {
+  position: relative;
+  z-index: 2;
+  color: var(--yellow);
+  font-size: clamp(25px, 3vw, 42px);
+  text-shadow: 2px 3px 0 var(--blue-dark);
+}
+
+/* Ocultar correctamente imágenes y textos */
+
+.memory-card img[hidden],
+.memory-card span[hidden] {
+  display: none !important;
+}
+
+/* Imagen del Pokémon */
+
+.memory-card img {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+/* Carta descubierta */
+
+.memory-card:has(img:not([hidden])) {
+  background: linear-gradient(145deg, #fffdf5, #dcecff);
+  border-color: #f5c928;
+}
+
+.memory-card:has(img:not([hidden]))::before,
+.memory-card:has(img:not([hidden]))::after {
+  display: none;
+}
+
+/* Efecto al pasar el ratón */
+
+.memory-card:not(:disabled):hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow:
+    0 0 0 2px var(--blue-dark),
+    0 8px 18px rgba(0, 0, 0, 0.4);
+}
+
+/* Parejas encontradas */
+
+.memory-card.matched {
+  background: linear-gradient(145deg, #c9f6b6, #8bdc83);
+  border-color: #42a85a;
+  box-shadow:
+    0 0 0 2px #267b3d,
+    0 4px 10px rgba(0, 0, 0, 0.2);
+  cursor: default;
+  opacity: 1;
+}
+
+/* =========================================
+   RANKING - COLUMNA IZQUIERDA INFERIOR
+   ========================================= */
+
+.game-history {
+  grid-area: ranking;
+  min-height: 0;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.game-history h2 {
+  font-size: 25px;
+  margin-bottom: 12px;
+}
+
+.game-history table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: center;
+}
+
+.game-history th {
+  padding: 9px 4px;
+  background: var(--yellow);
+  color: var(--blue);
+  font-weight: 900;
+  border-bottom: 3px solid var(--blue);
+}
+
+.game-history td {
+  padding: 8px 4px;
+  border-bottom: 1px solid rgba(8, 44, 131, 0.12);
+  color: var(--blue-dark);
+  overflow-wrap: anywhere;
+}
+
+.game-history tbody tr:nth-child(even) {
+  background: rgba(255, 231, 122, 0.35);
+}
+
+/* Partida más reciente */
+
+.latest-game {
+  background: rgba(255, 207, 24, 0.55) !important;
+  font-weight: 900;
+}
+
+.latest-game td {
+  border-top: 2px solid var(--yellow);
+  border-bottom: 2px solid var(--yellow);
+}
+
+
+/* NEW GAME - COMPACT DESIGN */
+
+.game-setup {
+  padding: 16px 22px;
+}
+
+.game-setup h2 {
+  margin: 0 0 12px;
+  font-size: 1.5rem;
+}
+
+.game-setup form {
+  display: grid;
+  grid-template-columns: 1fr 110px;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.game-setup label {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.game-setup input {
+  min-width: 0;
+  padding: 10px 12px;
+}
+
+.game-setup button {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 10px 16px;
+  font-size: 1rem;
+}
+
+.game-setup button[hidden] {
+  display: none;
+}
+
+
+/* =========================================
+   RESPONSIVE - TABLETS Y MOVILES
+   ========================================= */
+
+@media (max-width: 850px) {
+
+  #app {
+    padding: 12px;
   }
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
+  #app > main:has(.game-board) {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+    gap: 14px;
   }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
+
+  /* Reorganizar los bloques */
+  .game-sidebar {
+    display: contents;
+  }
+
+  .game-header {
+    order: 1;
+  }
+
+  .game-setup {
+    order: 2;
+  }
+
+  .game-content {
+    order: 3;
+    width: 100%;
+  }
+
+  .game-history {
+    order: 4;
+    max-height: 400px;
+  }
+
+  .game-board {
+    min-height: 550px;
+  }
+}
+
+
+/* =========================================
+   PANTALLAS PEQUEÑAS
+   ========================================= */
+
+@media (max-width: 480px) {
+
+  h1 {
+    font-size: 38px;
+  }
+
+  .game-header,
+  .game-setup,
+  .game-board,
+  .game-history {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .game-board {
+    min-height: 450px;
+  }
+
+  /* Distribución de las cartas */
+  #game-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: 125px;
+    gap: 9px;
+    align-content: start;
+  }
+
+  .memory-card {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+    border-width: 3px;
+    border-radius: 10px;
+  }
+
+  #game-timer {
+    font-size: 16px;
   }
 }
