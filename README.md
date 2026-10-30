@@ -12,11 +12,11 @@ Players can create their own profile, choose their favourite Pokémon, customise
 
 ## 🌐 Live Demo
 
-[Play PokeMemory](YOUR_DEPLOYED_APP_URL)
+[Play PokeMemory](https://veronicapalacios.github.io/PokeMemory/)
 
 ## 🎥 Video Demonstration
 
-[Watch the project demonstration](YOUR_YOUTUBE_VIDEO_URL)
+[Watch the project demonstration]([https://youtu.be/TQAhbjEn01o])
 
 ---
 
